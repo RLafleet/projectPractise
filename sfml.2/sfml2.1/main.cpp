@@ -1,7 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
-#include <iostream>
 #include <cmath>
 
 constexpr unsigned WINDOW_WIDTH = 800;
@@ -11,11 +10,12 @@ int main() {
     constexpr float BALL_SIZE = 40;
     sf::RenderWindow window(sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}), "Wave Moving Ball");
     sf::Clock clock;
-    const sf::Vector2f position = {10, 350};
+    
     sf::CircleShape ball(BALL_SIZE);
+    ball.setPosition({400, 250});
     ball.setFillColor(sf::Color(0xFF, 0xFF, 0xFF));
+    
     sf::Vector2f speed = {100.f, 80.f};
-
     float totalTime = 0.0f; 
     constexpr float periodY = 2;
 
@@ -33,7 +33,7 @@ int main() {
         sf::Vector2f position = ball.getPosition();
         
         const float wavePhase = totalTime * float(2 * M_PI);
-
+        
         if ((position.x + 2 * BALL_SIZE >= WINDOW_WIDTH) && (speed.x > 0)) {
             speed.x = -speed.x;
         }
