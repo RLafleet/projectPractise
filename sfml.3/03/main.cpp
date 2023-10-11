@@ -5,13 +5,13 @@
 #include <iostream>
 #include <algorithm>
 
-void init(sf::ConvexShape& pointer)
+void init(sf::ConvexShape &pointer)
 {
     pointer.setPointCount(3);
-    pointer.setPoint(0, { 40, 0});
-    pointer.setPoint(1, { -20, -20});
-    pointer.setPoint(2, { -20, 20 });
-    pointer.setPosition({ 400, 300 });
+    pointer.setPoint(0, {40, 0});
+    pointer.setPoint(1, {-20, -20});
+    pointer.setPoint(2, {-20, 20});
+    pointer.setPosition({400, 300});
     pointer.setFillColor(sf::Color(0xFF, 0x80, 0x80));
 }
 
@@ -21,21 +21,21 @@ float toDegrees(float radians)
 }
 
 void onMouseMove(
-    const sf::Event::MouseMoveEvent& event, 
-    sf::Vector2f& mousePosition,
-    bool& mouseMoveCheck)
+    const sf::Event::MouseMoveEvent &event,
+    sf::Vector2f &mousePosition,
+    bool &mouseMoveCheck)
 {
     if (!mouseMoveCheck)
     {
         mouseMoveCheck = true;
     }
-    mousePosition = { float(event.x), float(event.y) };
+    mousePosition = {float(event.x), float(event.y)};
 }
 
 void pollEvents(
-    sf::RenderWindow& window, 
-    sf::Vector2f& mousePosition,
-    bool& mouseMoveCheck)
+    sf::RenderWindow &window,
+    sf::Vector2f &mousePosition,
+    bool &mouseMoveCheck)
 {
     sf::Event event;
     while (window.pollEvent(event))
@@ -47,20 +47,19 @@ void pollEvents(
             break;
         case sf::Event::MouseMoved:
             onMouseMove(event.mouseMove, mousePosition, mouseMoveCheck);
-            break;  
+            break;
         default:
             break;
         }
     }
-
 }
 
 void update(
-    sf::Vector2f& mousePosition, 
-    sf::ConvexShape& pointer, 
-    sf::Clock& clock, 
-    float& totalTime, 
-    bool& mouseMoveCheck)
+    sf::Vector2f &mousePosition,
+    sf::ConvexShape &pointer,
+    sf::Clock &clock,
+    float &totalTime,
+    bool &mouseMoveCheck)
 {
     const float deltaTime = clock.restart().asSeconds();
     totalTime += deltaTime;
@@ -90,8 +89,8 @@ void update(
 }
 
 void redrawFrame(
-    sf::RenderWindow& window, 
-    sf::ConvexShape& pointer)
+    sf::RenderWindow &window,
+    sf::ConvexShape &pointer)
 {
     window.clear();
     window.draw(pointer);
@@ -102,7 +101,7 @@ int main()
 {
     constexpr unsigned WINDOW_WIDTH = 800;
     constexpr unsigned WINDOW_HEIGHT = 600;
-    
+
     sf::Clock clock;
     float totalTime = 0.0f;
 
@@ -111,7 +110,7 @@ int main()
     sf::RenderWindow window(
         sf::VideoMode({WINDOW_WIDTH, WINDOW_HEIGHT}),
         "Prints mouse events to terminal");
-    
+
     sf::ConvexShape pointer;
     sf::Vector2f mousePosition;
     bool mouseMoveCheck = false;
