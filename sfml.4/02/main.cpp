@@ -13,11 +13,17 @@ struct Cat
     bool catRotate;
 };
 
+struct LaserPointer
+{
+    sf::Sprite pointerSprite;
+    sf::Texture pointerTexture;
+};
+
 void initObject(Cat &cat)
 {
     if (!cat.catTexture.loadFromFile("./02/cat.png"))
     {
-        std::cerr << "Failed to load texture!" << std::endl;
+        std::cerr << "Failed to load cat texture." << std::endl;
         return;
     }
 
@@ -27,7 +33,19 @@ void initObject(Cat &cat)
     cat.catSprite.setPosition(400, 300);
 }
 
-void onMouseMove(const sf::Event::MouseMoveEvent &event, sf::Vector2f &mousePosition, bool &mouseMoveCheck)
+void initLaserPointer(LaserPointer &laserPointer)
+{
+    if (!laserPointer.pointerTexture.loadFromFile("./02/red_pointer.png"))
+    {
+        std::cerr << "Failed to load laser pointer texture." << std::endl;
+        return;
+    }
+
+    laserPointer.pointerSprite.setTexture(laserPointer.pointerTexture);
+    laserPointer.pointerSprite.setOrigin(laserPointer.pointerTexture.getSize().x / 2.0f, laserPointer.pointerTexture.getSize().y / 2.0f);
+}
+
+void onMouseMovePressed(const sf::Event::MouseButtonEvent &event, sf::Vector2f &mousePosition, bool &mouseMoveCheck)
 {
     if (!mouseMoveCheck)
     {
@@ -36,7 +54,7 @@ void onMouseMove(const sf::Event::MouseMoveEvent &event, sf::Vector2f &mousePosi
     mousePosition = {float(event.x), float(event.y)};
 }
 
-void pollEvents(sf::RenderWindow &window, sf::Vector2f &mousePosition, bool &mouseMoveCheck)
+void pollEvents(sf::RenderWindow &window, sf::Vector2f &mousePosition, bool &mouseMoveCheck, LaserPointer &laserPointer)
 {
     sf::Event event;
     while (window.pollEvent(event))
@@ -46,8 +64,9 @@ void pollEvents(sf::RenderWindow &window, sf::Vector2f &mousePosition, bool &mou
         case sf::Event::Closed:
             window.close();
             break;
-        case sf::Event::MouseMoved:
-            onMouseMove(event.mouseMove, mousePosition, mouseMoveCheck);
+        case sf::Event::MouseButtonPressed:
+            onMouseMovePressed(event.mouseButton, mousePosition, mouseMoveCheck);
+            laserPointer.pointerSprite.setPosition(mousePosition);
             break;
         default:
             break;
@@ -59,7 +78,7 @@ void update(sf::Vector2f &mousePosition, Cat &cat, sf::Clock &clock, float &tota
 {
     const float deltaTime = clock.restart().asSeconds();
     totalTime += deltaTime;
-
+    sf::Event event;
     if (mouseMoveCheck)
     {
         const sf::Vector2f delta = mousePosition - cat.catSprite.getPosition();
@@ -70,13 +89,14 @@ void update(sf::Vector2f &mousePosition, Cat &cat, sf::Clock &clock, float &tota
             const int catSPEED = 40;
             const sf::Vector2f direction = {delta.x / magnitude * catSPEED * deltaTime, delta.y / magnitude * catSPEED * deltaTime};
             cat.catSprite.setPosition(cat.catSprite.getPosition() + direction);
+            const int DELTA_ROTATE = 3;
 
-            if (delta.x > 0 && cat.catRotate)
+            if ((delta.x - DELTA_ROTATE) > 0 && cat.catRotate)
             {
                 cat.catSprite.setScale(1, 1);
                 cat.catRotate = false;
             }
-            if (delta.x < 0 && !cat.catRotate)
+            if ((delta.x + DELTA_ROTATE) < 0 && !cat.catRotate)
             {
                 cat.catSprite.setScale(-1, 1);
                 cat.catRotate = true;
@@ -85,10 +105,11 @@ void update(sf::Vector2f &mousePosition, Cat &cat, sf::Clock &clock, float &tota
     }
 }
 
-void redrawFrame(sf::RenderWindow &window, Cat &cat)
+void redrawFrame(sf::RenderWindow &window, Cat &cat, LaserPointer &laserPointer)
 {
     window.clear(sf::Color::White);
     window.draw(cat.catSprite);
+    window.draw(laserPointer.pointerSprite);
     window.display();
 }
 
@@ -112,12 +133,16 @@ int main()
     sf::Vector2f mousePosition;
     bool mouseMoveCheck = false;
 
+    LaserPointer laserPointer;
     initObject(cat);
+    initLaserPointer(laserPointer);
+
     while (window.isOpen())
     {
-        pollEvents(window, mousePosition, mouseMoveCheck);
+        pollEvents(window, mousePosition, mouseMoveCheck, laserPointer);
         update(mousePosition, cat, clock, totalTime, mouseMoveCheck);
-        redrawFrame(window, cat);
+        redrawFrame(window, cat, laserPointer);
     }
+
     return 0;
 }
